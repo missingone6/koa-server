@@ -9,9 +9,15 @@ const REDIS = {
   port: process.env.REDIS_PORT || 6379,
 }
 
+const JWT_SECRET = 'galrkgeajlrgbpno';
+// https://github.com/auth0/node-jsonwebtoken#token-expiration-exp-claim
+const JWT_EXPIRESIN = '1d';
+
 export default {
   DB_NAME,
   MONGO_HOSTNAME,
   DB_URL,
   REDIS,
+  JWT_SECRET,
+  JWT_EXPIRESIN,
 }

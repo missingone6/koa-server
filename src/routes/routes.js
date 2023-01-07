@@ -1,5 +1,9 @@
 import combineRoutes from 'koa-combine-routers'
 
-import publicController from './publicRouter.js';
+import publicRouter from './publicRouter';
+import loginRouter from './loginRouter';
 
-export default combineRoutes(publicController)
+export default combineRoutes(
+  publicRouter,
+  loginRouter
+)

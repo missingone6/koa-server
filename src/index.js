@@ -7,19 +7,14 @@ import statics from 'koa-static';
 import compose from 'koa-compose'
 import router from './routes/routes';
 import jsonUtil from 'koa-json';
+import JWT from 'koa-jwt';
 import { initRedis } from './config/RedisConfig';
+import config from './config';
+import errorHandle from './common/errorHandle';
 const app = new koa();
-// router.post('/post', async (ctx) => {
-//   const { body } = ctx.request;
-//   console.log(body)
-//   console.log(ctx.request)
-//   ctx.body = 'hello post'
-// });
-
-
-// router.get('/api', (ctx) => {
-//   ctx.body = 'hello /api11111'
-// });
+const jwt = JWT({
+  secret: config.JWT_SECRET,
+}).unless({ path: [/^\/public/, /^\/api\/users\/login/, /^\/api\/public/] });
 
 initRedis();
 
@@ -29,6 +24,8 @@ const middleware = compose([
   cors(),
   jsonUtil(),
   helmet(),
+  errorHandle,
+  jwt
 ])
 app.use(middleware);
 
