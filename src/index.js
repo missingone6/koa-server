@@ -14,7 +14,7 @@ import errorHandle from './common/errorHandle';
 const app = new koa();
 const jwt = JWT({
   secret: config.JWT_SECRET,
-}).unless({ path: [/^\/public/, /^\/api\/users\/login/, /^\/api\/public/] });
+}).unless({ path: [/^\/public/, /^\/api\/users/, /^\/api\/public/] });
 
 initRedis();
 
