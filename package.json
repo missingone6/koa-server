@@ -30,6 +30,7 @@
     "koa-jwt": "^4.0.3",
     "koa-router": "^7.4.0",
     "koa-static": "^5.0.0",
+    "moment": "^2.29.4",
     "mongoose": "^6.2.6",
     "node-redis-retry-strategy": "^2.1.1",
     "redis": "^4.0.4",
