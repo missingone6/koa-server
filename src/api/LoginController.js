@@ -1,8 +1,27 @@
 import jwt from 'jsonwebtoken';
+import moment from 'moment';
 import { checkCode } from '../common/util';
 import config from '../config';
 import UsersModel from '../model/User';
+import SignInModel from '../model/SignIn';
 
+// 判断今日是否签到
+const addIsSignIn = async (userObj) => {
+  const result = await SignInModel.findByUid(userObj._id)
+  // 用户有签到记录
+  if (result !== null) {
+    userObj.lastSignIn = result.created;
+    if (moment(result.created).format('YYYY-MM-DD') === moment().format('YYYY-MM-DD')) {
+      userObj.isSignIn = true
+    } else {
+      userObj.isSignIn = false
+    }
+  } else {
+    // 用户无签到记录
+    userObj.isSignIn = false
+  }
+  return userObj
+}
 
 class LoginController {
   async login(ctx) {
@@ -21,9 +40,21 @@ class LoginController {
         }
       } else {
         if (user.password === password) {
-          const token = jwt.sign({ username: username }, config.JWT_SECRET, { expiresIn: config.JWT_EXPIRESIN });
+          const token = jwt.sign({
+            username: username,
+            _id: user._id,
+          }, config.JWT_SECRET, { expiresIn: config.JWT_EXPIRESIN });
+          const arr = ['password'];
+          let data = {};
+          Object.keys(user.toJSON()).forEach((key) => {
+            if (!arr.includes(key)) {
+              data[key] = user[key];
+            }
+          });
+          data = await addIsSignIn(data)
           ctx.body = {
             code: 200,
+            data,
             msg: '登录成功',
             token: token,
           }

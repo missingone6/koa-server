@@ -13,7 +13,7 @@ const UserSchema = new Schema({
   favs: { type: Number, default: 100 },
   gender: { type: String, default: '' },
   roles: { type: Array, default: ['user'] },
-  pic: { type: String, default: '/img/header.jpg' },
+  pic: { type: String, default: '/img/header.webp' },
   mobile: { type: String, match: /^1[3-9](\d{9})$/, default: '' },
   status: { type: String, default: '0' },
   regmark: { type: String, default: '' },
