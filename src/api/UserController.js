@@ -2,6 +2,9 @@ import SignInModel from '../model/SignIn'
 import { getJWTPayload } from '../common/util'
 import User from '../model/User'
 import moment from 'moment';
+import { v4 as uuidv4 } from 'uuid'
+import { getValue, setValue } from '../config/RedisConfig';
+import send from '../config/MailConfig';
 
 class UserController {
   // 用户签到接口
@@ -128,6 +131,82 @@ class UserController {
       code: 200,
       data: result,
       msg: '查询积分成功',
+    }
+  }
+
+  // 发送邮箱更新邮件
+  async sendmailAboutUsername(ctx) {
+    const body = ctx.request.body
+
+    if (body.username === undefined) {
+      ctx.body = {
+        code: 404,
+        msg: '缺少username参数'
+      }
+      return;
+    }
+    const obj = await getJWTPayload(ctx.header.authorization)
+    // 判断用户是否修改了邮箱
+    const user = await User.findOne({ _id: obj._id })
+    if (body.username && body.username !== user.username) {
+      // 用户修改了邮箱, 发送reset邮件
+      // 判断用户的新邮箱是否已经有人注册
+      const tempUser = await User.findOne({ username: body.username })
+      if (tempUser && tempUser.password) {
+        ctx.body = {
+          code: 501,
+          msg: '邮箱已被人注册'
+        }
+      } else {
+        const key = uuidv4();
+        await setValue(key, obj._id, 10 * 60);
+        await send({
+          subject: '重置邮箱',
+          data: {
+            key: key,
+            username: body.username
+          },
+          route: '/confirm',
+          expire: moment()
+            .add(10, 'minutes')
+            .format('YYYY-MM-DD HH:mm:ss'),
+          email: user.username,
+          user: user.name
+        })
+        ctx.body = {
+          code: 200,
+          msg: `账号修改需要邮件确认,邮件已发至${user.username}，请查收邮件！`
+        }
+      }
+    } else {
+      ctx.body = {
+        code: 501,
+        msg: '新邮箱不能和原来的邮箱一致'
+      }
+    }
+  }
+
+  // 邮箱更新
+  async usernameUpdate(ctx) {
+    const body = ctx.request.body;
+    console.log(body)
+    if (body.key === undefined) {
+      ctx.body = {
+        code: 404,
+        msg: '缺少key参数'
+      }
+      return;
+    }
+    const _id = await getValue(body.key)
+    await User.updateOne(
+      { _id },
+      {
+        username: body.username
+      }
+    )
+    ctx.body = {
+      code: 200,
+      msg: '更新用户名成功'
     }
   }
 }

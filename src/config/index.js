@@ -13,6 +13,10 @@ const JWT_SECRET = 'galrkgeajlrgbpno';
 // https://github.com/auth0/node-jsonwebtoken#token-expiration-exp-claim
 const JWT_EXPIRESIN = '1d';
 
+const developmentBaseUrl = 'http://localhost:3000';
+const productionBaseUrl = '';
+const BASE_URL = process.env.NODE_ENV === 'development' ? developmentBaseUrl : productionBaseUrl;
+
 export default {
   DB_NAME,
   MONGO_HOSTNAME,
@@ -20,4 +24,5 @@ export default {
   REDIS,
   JWT_SECRET,
   JWT_EXPIRESIN,
+  BASE_URL,
 }
