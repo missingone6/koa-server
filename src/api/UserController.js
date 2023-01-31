@@ -1,9 +1,9 @@
 import SignInModel from '../model/SignIn'
-import { getJWTPayload } from '../common/util'
+import { checkCode, getJWTPayload } from '../common/util'
 import User from '../model/User'
 import moment from 'moment';
 import { v4 as uuidv4 } from 'uuid'
-import { getValue, setValue } from '../config/RedisConfig';
+import { getHValue, getValue, setValue } from '../config/RedisConfig';
 import send from '../config/MailConfig';
 
 class UserController {
@@ -166,12 +166,12 @@ class UserController {
             key: key,
             username: body.username
           },
-          route: '/confirm',
+          route: '/confirm/username',
           expire: moment()
             .add(10, 'minutes')
             .format('YYYY-MM-DD HH:mm:ss'),
           email: user.username,
-          user: user.name
+          name: user.name
         })
         ctx.body = {
           code: 200,
@@ -189,15 +189,21 @@ class UserController {
   // 邮箱更新
   async usernameUpdate(ctx) {
     const body = ctx.request.body;
-    console.log(body)
-    if (body.key === undefined) {
+    if (body.key === undefined || body.username === undefined) {
       ctx.body = {
         code: 404,
-        msg: '缺少key参数'
+        msg: '缺少参数'
       }
       return;
     }
     const _id = await getValue(body.key)
+    if (_id === null) {
+      ctx.body = {
+        code: 404,
+        msg: '很抱歉，链接有误或者链接已过期'
+      }
+      return;
+    }
     await User.updateOne(
       { _id },
       {
@@ -209,6 +215,93 @@ class UserController {
       msg: '更新用户名成功'
     }
   }
+
+  // 密码更新
+  async passwordUpdate(ctx) {
+    const { key } = ctx.request.body;
+    if (key === undefined) {
+      ctx.body = {
+        code: 404,
+        msg: '缺少参数'
+      }
+      return;
+    }
+    const obj = await getHValue(key);
+
+    if (obj === null || Object.keys(obj).length === 0) {
+      ctx.body = {
+        code: 404,
+        msg: '很抱歉，链接有误或者链接已过期'
+      }
+      return;
+    }
+    const { _id, password } = obj;
+    await User.updateOne(
+      { _id },
+      { password }
+    )
+    ctx.body = {
+      code: 200,
+      msg: '更新密码成功'
+    }
+  }
+
+  // 发送找回密码邮件
+  async sendmailAboutPassword(ctx) {
+    const { newPassword, cid, code, username } = ctx.request.body
+    // 检查验证码是否有效，是否正确
+    const isCodeCorrectAndValid = await checkCode(cid, code);
+    if (!isCodeCorrectAndValid) {
+      ctx.body = {
+        code: 401,
+        msg: '图片验证码错误'
+      }
+      return;
+    }
+
+    const user = await User.findOne({ username })
+    if (user === null) {
+      ctx.body = {
+        code: 404,
+        msg: '邮箱还未注册，请先去注册'
+      }
+      return;
+    }
+    // 判断用户是否修改了密码
+    if (newPassword && newPassword === user.username) {
+      ctx.body = {
+        code: 501,
+        msg: '新密码不能和原来的密码一致'
+      }
+      return;
+    }
+    // 用户修改了密码, 发送reset邮件
+    const key = uuidv4();
+    await setValue(key, {
+      _id: user._id,
+      password: newPassword
+    }, 10 * 60);
+    await send({
+      subject: '重置密码',
+      data: {
+        key,
+        username,
+      },
+      route: '/confirm/password',
+      expire: moment()
+        .add(10, 'minutes')
+        .format('YYYY-MM-DD HH:mm:ss'),
+      email: user.username,
+      name: user.name
+    })
+    ctx.body = {
+      code: 200,
+      msg: `密码修改需要邮件确认,邮件已发至${user.username}，请查收邮件！`
+    }
+  }
+
+
+
 }
 
 export default new UserController()

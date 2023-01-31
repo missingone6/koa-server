@@ -14,8 +14,15 @@ import errorHandle from './common/errorHandle';
 const app = new koa();
 const jwt = JWT({
   secret: config.JWT_SECRET,
-}).unless({ path: [/^\/public/, /^\/api\/login/, /^\/api\/public/] });
-
+}).unless({
+  path: [
+    /^\/public/,
+    /^\/api\/login/,
+    /^\/api\/public/,
+    /^\/api\/email\/password$/,
+    /^\/api\/users\/password$/,
+  ]
+});
 initRedis();
 
 const middleware = compose([

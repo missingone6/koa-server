@@ -9,9 +9,12 @@ router.patch('/users/fav', UserController.userSign);
 router.get('/users/fav', UserController.getFavs);
 // 用户邮箱更新
 router.patch('/users/username', UserController.usernameUpdate);
-
+// 用户密码更新
+router.patch('/users/password', UserController.passwordUpdate);
 
 // 发送邮箱更新邮件
-router.get('/email/username', UserController.sendmailAboutUsername);
+router.post('/email/username', UserController.sendmailAboutUsername);
+// 发送找回密码邮件
+router.post('/email/password', UserController.sendmailAboutPassword);
 
 export default router;

@@ -14,7 +14,7 @@ async function send(sendInfo) {
     }
   })
 
-  const { subject, email, expire, route, data } = sendInfo;
+  const { subject, email, expire, route, data, name } = sendInfo;
   const url = `${config.BASE_URL}${route}?` + qs.stringify(data)
 
   // send mail with defined transport object
@@ -26,9 +26,10 @@ async function send(sendInfo) {
     <div style="height:200px;width:100%;border-radius: 20px;border: 1px solid #03a9f4;overflow: hidden;">
       <div style="box-sizing: border-box; height:50px;width:100%;background-color: #03a9f4;font-size: 42px;line-height: 50px;padding: 0 10px;">WeShare</div>
       <div style="box-sizing: border-box; height:150px; width:100%; padding: 10px;">
-        如若发现不是您本人操作,请忽略！<br/>
+        您好，<span style="color: #03a9f4;">${name}</span>!<br/>
         点此链接<a href=${url}>${url}</a>
-        ,即可${subject},此链接将于${expire}过期。请谨慎操作!
+        ,即可${subject},此链接将于${expire}过期。请谨慎操作!<br/>
+        如若发现不是您本人操作,请忽略！
       </div>
     </div>
     `
