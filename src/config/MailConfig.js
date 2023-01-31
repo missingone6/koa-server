@@ -15,7 +15,7 @@ async function send(sendInfo) {
   })
 
   const { subject, email, expire, route, data, name } = sendInfo;
-  const url = `${config.BASE_URL}${route}?` + qs.stringify(data)
+  const url = `${config.Front_BASE_URL}${route}?` + qs.stringify(data)
 
   // send mail with defined transport object
   const info = await transporter.sendMail({

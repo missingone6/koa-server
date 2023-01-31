@@ -8,4 +8,7 @@ router.get('/api/public/links', ContentController.getLinks);
 router.get('/api/public/tips', ContentController.getTips);
 router.get('/api/public/topWeek', ContentController.getTopWeek);
 
+// 图片上传
+router.post('/api/users/photo', ContentController.upLoadPhoto);
+
 export default router;

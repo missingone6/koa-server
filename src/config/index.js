@@ -1,3 +1,4 @@
+import path from 'path'
 const MONGO_HOSTNAME = process.env.DB_HOST || 'localhost'
 const MONGO_PORT = process.env.DB_PORT || '27017'
 const DB_NAME = process.env.DB_NAME || 'test'
@@ -13,9 +14,19 @@ const JWT_SECRET = 'galrkgeajlrgbpno';
 // https://github.com/auth0/node-jsonwebtoken#token-expiration-exp-claim
 const JWT_EXPIRESIN = '1d';
 
-const developmentBaseUrl = 'http://localhost:3000';
-const productionBaseUrl = '';
-const BASE_URL = process.env.NODE_ENV === 'development' ? developmentBaseUrl : productionBaseUrl;
+// 前端
+export const frontDevelopmentBaseUrl = 'http://localhost:3000';
+export const frontProductionBaseUrl = '';
+export const Front_BASE_URL = process.env.NODE_ENV === 'development' ? frontDevelopmentBaseUrl : frontProductionBaseUrl;
+
+// 后端
+const backDevelopmentBaseUrl = 'http://localhost:8000';
+const backProductionBaseUrl = '';
+const BACK_BASE_URL = process.env.NODE_ENV === 'development' ? backDevelopmentBaseUrl : backProductionBaseUrl;
+const photoUploadPath = process.env.NODE_ENV === 'development'
+  ? path.join(path.resolve(__dirname), '../../public/img')
+  : path.join(path.resolve(__dirname), '../../public/img')
+console.log('11',photoUploadPath)
 
 export default {
   DB_NAME,
@@ -24,5 +35,6 @@ export default {
   REDIS,
   JWT_SECRET,
   JWT_EXPIRESIN,
-  BASE_URL,
+  Front_BASE_URL,
+  photoUploadPath,
 }

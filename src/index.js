@@ -11,6 +11,8 @@ import JWT from 'koa-jwt';
 import { initRedis } from './config/RedisConfig';
 import config from './config';
 import errorHandle from './common/errorHandle';
+import koaMount from 'koa-mount';
+
 const app = new koa();
 const jwt = JWT({
   secret: config.JWT_SECRET,
@@ -26,8 +28,13 @@ const jwt = JWT({
 initRedis();
 
 const middleware = compose([
-  koaBody(),
-  statics(path.join(__dirname, '../public')),
+  koaBody({
+    multipart: true,
+    formidable: {
+      maxFileSize: 200 * 1024 * 1024 // 设置上传文件大小最大限制，默认2M
+    }
+  }),
+  koaMount('/public', statics(path.join(__dirname, '../public'))),
   cors(),
   jsonUtil(),
   helmet(),
