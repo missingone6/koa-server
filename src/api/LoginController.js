@@ -4,6 +4,7 @@ import { checkCode } from '../common/util';
 import config from '../config';
 import UsersModel from '../model/User';
 import SignInModel from '../model/SignIn';
+import { getHValue } from '../config/RedisConfig';
 
 // 判断今日是否签到
 const addIsSignIn = async (userObj) => {
@@ -116,6 +117,35 @@ class LoginController {
         code: 401,
         msg: '图片验证码错误'
       }
+    }
+  }
+  // 忘记密码
+  async password(ctx) {
+    const { key } = ctx.request.body;
+    if (key === undefined) {
+      ctx.body = {
+        code: 404,
+        msg: '缺少参数'
+      }
+      return;
+    }
+    const obj = await getHValue(key);
+
+    if (obj === null || Object.keys(obj).length === 0) {
+      ctx.body = {
+        code: 404,
+        msg: '很抱歉，链接有误或者链接已过期'
+      }
+      return;
+    }
+    const { _id, password } = obj;
+    await User.updateOne(
+      { _id },
+      { password }
+    )
+    ctx.body = {
+      code: 200,
+      msg: '更新密码成功'
     }
   }
 }

@@ -4,9 +4,7 @@ import PostModel from '../model/Post';
 import mkdir from 'make-dir';
 import { v4 as uuidv4 } from 'uuid'
 import config from '../config';
-import moment from 'moment';
 import fs from 'fs';
-import path from 'path';
 
 
 class ContentController {
@@ -86,7 +84,7 @@ class ContentController {
     // 文件后缀
     const ext = photo.name.split('.')[1]
     // 存储的位置
-    const dir =  config.photoUploadPath
+    const dir = config.photoUploadPath
     // 判断路径是否存在，如果不存在则创建
     await mkdir(dir)
 
@@ -96,7 +94,7 @@ class ContentController {
     const destPath = `${dir}/${name}.${ext}`
     const reader = fs.createReadStream(photo.path)
     const upStream = fs.createWriteStream(destPath)
-    const filePath = `/img/${name}.${ext}`
+    const filePath = `/public/img/${name}.${ext}`
     reader.pipe(upStream)
 
     ctx.body = {

@@ -216,34 +216,35 @@ class UserController {
     }
   }
 
-  // 密码更新
+  // 用户密码更新(重置密码)
   async passwordUpdate(ctx) {
-    const { key } = ctx.request.body;
-    if (key === undefined) {
+    const { oldp, newp } = ctx.request.body;
+    if (oldp === undefined || newp === undefined) {
       ctx.body = {
         code: 404,
         msg: '缺少参数'
       }
       return;
     }
-    const obj = await getHValue(key);
 
-    if (obj === null || Object.keys(obj).length === 0) {
+    const obj = await getJWTPayload(ctx.header.authorization)
+    const user = await User.findOne({ _id: obj._id });
+    if (user.password !== oldp) {
       ctx.body = {
-        code: 404,
-        msg: '很抱歉，链接有误或者链接已过期'
+        code: 501,
+        msg: '旧的密码有误'
       }
       return;
     }
-    const { _id, password } = obj;
     await User.updateOne(
-      { _id },
-      { password }
+      { _id: obj._id },
+      { password: newp }
     )
     ctx.body = {
       code: 200,
       msg: '更新密码成功'
     }
+
   }
 
   // 发送找回密码邮件
@@ -300,7 +301,34 @@ class UserController {
     }
   }
 
+  // 用户基本信息更新
+  async updateBasicInf(ctx) {
+    const body = ctx.request.body;
+    const obj = await getJWTPayload(ctx.header.authorization);
+    const temp = {};
+    ['gender', 'regmark', 'name'].forEach(key => {
+      if (body[key] !== undefined) {
+        temp[key] = body[key]
+      }
+    })
 
+
+    const result = await User.updateOne({ _id: obj._id }, temp)
+    console.log(result)
+    console.log('=====rrrrr==========')
+    if (result.modifiedCount === 0) {
+      ctx.body = {
+        code: 500,
+        msg: '更新失败'
+      }
+    } else {
+      ctx.body = {
+        code: 200,
+        data: temp,
+        msg: '更新成功',
+      }
+    }
+  }
 
 }
 
