@@ -10,5 +10,8 @@ router.get('/api/public/topWeek', ContentController.getTopWeek);
 
 // 图片上传
 router.post('/api/users/photo', ContentController.upLoadPhoto);
+// 发表新帖
+router.post('/api/content/posts', ContentController.addPost);
+
 
 export default router;

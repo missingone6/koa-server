@@ -1,10 +1,12 @@
 import LinkModel from '../model/Link';
 import TipModel from '../model/Tip';
 import PostModel from '../model/Post';
+import UserModel from '../model/User';
 import mkdir from 'make-dir';
 import { v4 as uuidv4 } from 'uuid'
 import config from '../config';
 import fs from 'fs';
+import { getJWTPayload } from '../common/util'
 
 
 class ContentController {
@@ -101,6 +103,36 @@ class ContentController {
       code: 200,
       msg: '图片上传成功',
       data: filePath
+    }
+  }
+
+  // 发表新帖
+  async addPost(ctx) {
+    const { title, favs, content, catalog } = ctx.request.body;
+
+    const obj = await getJWTPayload(ctx.header.authorization)
+    const user = await UserModel.findByID({ _id: obj._id })
+    if (user)
+      // 判断用户的所剩积分数是否足够
+      // 积分数不足,则直接返回
+      if (user.favs < favs) {
+        ctx.body = {
+          code: 501,
+          msg: '很抱歉,用户积分不足'
+        }
+        return
+      }
+    // 积分数足够,则1.创建新的post,2.减少积分
+    await UserModel.updateOne({ _id: obj._id }, { $inc: { favs: -favs } })
+    const newPost = new PostModel({
+      title, favs, content, catalog
+    })
+    newPost.uid = obj._id
+    const result = await newPost.save()
+    ctx.body = {
+      code: 200,
+      msg: '帖子发表成功',
+      data: result
     }
   }
 }
