@@ -12,6 +12,8 @@ router.get('/api/public/topWeek', ContentController.getTopWeek);
 router.post('/api/users/photo', ContentController.upLoadPhoto);
 // 发表新帖
 router.post('/api/content/posts', ContentController.addPost);
+// 查询文章详情（帖子详情）
+router.get('/api/public/list', ContentController.getPostsDetail);
 
 
 export default router;

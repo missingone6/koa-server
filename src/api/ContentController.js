@@ -8,7 +8,6 @@ import config from '../config';
 import fs from 'fs';
 import { getJWTPayload } from '../common/util'
 
-
 class ContentController {
 
   // 查询文章列表
@@ -51,6 +50,27 @@ class ContentController {
     }
   }
 
+  // 查询文章详情（帖子详情）
+  async getPostsDetail(ctx) {
+    const { pid } = ctx.request.query;
+    if (!pid) {
+      ctx.body = {
+        code: 500,
+        msg: '文章id为空'
+      }
+      return;
+    }
+    const post = await PostModel.findPostByPid(pid)
+
+    if (post) {
+      ctx.body = {
+        code: 200,
+        data: post,
+        msg: '查询文章详情成功'
+      }
+      return
+    }
+  }
   // 查询友情链接
   async getLinks(ctx) {
     const result = await LinkModel.find()
