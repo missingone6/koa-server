@@ -72,6 +72,16 @@ PostSchema.statics = {
     }).sort({ answer: -1 })
       .limit(5)
   },
+
+  /**
+    * 根据pid查询文章
+    */
+  findPostByPid: function (pid) {
+    return this.findOne({ _id: pid }).populate({
+      path: 'uid',
+      select: 'name pic isVip _id'
+    })
+  }
 }
 const PostModel = mongoose.model('posts', PostSchema);
 
