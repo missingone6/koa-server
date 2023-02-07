@@ -97,6 +97,7 @@ PostSchema.statics = {
   getLengthOfListsByUid: function (id) {
     return this.find({ uid: id }).countDocuments();
   },
+  
 }
 const PostModel = mongoose.model('posts', PostSchema);
 

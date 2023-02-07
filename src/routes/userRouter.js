@@ -24,5 +24,8 @@ router.post('/users/collect', UserController.setOrCancelCollect);
 
 // 查询用户发贴记录(查询用户文章列表)
 router.get('/users/lists', UserController.getPostsByUid);
+// 查询用户收藏的帖子
+router.get('/users/collect', UserController.getPostsByCollecting);
+
 
 export default router;

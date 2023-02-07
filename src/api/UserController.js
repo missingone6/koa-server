@@ -396,7 +396,38 @@ class UserController {
       }
     }
   }
-  
+
+  // 查询用户收藏的帖子
+  async getPostsByCollecting(ctx) {
+    const { page, limit } = ctx.request.query;
+    const obj = await getJWTPayload(ctx.header.authorization)
+    let result = await UserCollectModel.getListsByUid(
+      obj._id,
+      page ? Number(page) : 0,
+      limit ? Number(limit) : 10,
+    )
+    if (result) {
+      result = result.map((item) => item.toJSON())
+      for (let i = 0; i < result.length; i++) {
+        let item = result[i];
+        const post = await PostModel.findOne({ _id: item.pid })
+        item.title = post.title;
+        item.created = post.created;
+      }
+      const total = await UserCollectModel.getLengthOfListsByUid(obj._id)
+      ctx.body = {
+        code: 200,
+        data: result,
+        total,
+        msg: '查询用户收藏的帖子成功'
+      }
+    } else {
+      ctx.body = {
+        code: 500,
+        msg: '查询用户收藏的帖子失败'
+      }
+    }
+  }
 }
 
 export default new UserController()
