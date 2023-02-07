@@ -65,11 +65,20 @@ class CommentsController {
     const newPost = await PostModel.findOne({ _id: pid })
     newComment.uid = newPost.uid
     // 保存
-    const comment = await newComment.save()
-    ctx.body = {
-      code: 200,
-      data: comment,
-      msg: '评论成功'
+    const comment = await newComment.save();
+    // 更新文章评论数量
+    await PostModel.updateOne(
+      { _id: pid },
+      {
+        $inc: { answer: 1 }
+      }
+    );
+    if (comment) {
+      ctx.body = {
+        code: 200,
+        data: comment,
+        msg: '评论成功'
+      }
     }
   }
 

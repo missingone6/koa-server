@@ -17,7 +17,7 @@ const errorHandle = (ctx, next) => {
         ? { stack: err.stack }
         : {}
       )
-      // console.log(err.stack);
+      console.log(err.stack);
     }
   });
 };

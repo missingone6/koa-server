@@ -19,6 +19,7 @@ router.post('/email/username', UserController.sendmailAboutUsername);
 // 发送找回密码邮件
 router.post('/email/password', UserController.sendmailAboutPassword);
 
-
+// 收藏/取消收藏接口
+router.post('/users/collect', UserController.setOrCancelCollect);
 
 export default router;

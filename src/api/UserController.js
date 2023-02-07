@@ -1,6 +1,7 @@
 import SignInModel from '../model/SignIn'
 import { checkCode, getJWTPayload } from '../common/util'
 import User from '../model/User'
+import UserCollectModel from '../model/UserCollect'
 import moment from 'moment';
 import { v4 as uuidv4 } from 'uuid'
 import { getHValue, getValue, setValue } from '../config/RedisConfig';
@@ -330,6 +331,45 @@ class UserController {
     }
   }
 
+  // 收藏/取消收藏接口
+  async setOrCancelCollect(ctx) {
+    const { pid } = ctx.request.body;
+    if (pid === undefined) {
+      ctx.body = {
+        code: 404,
+        msg: '缺少pid参数'
+      };
+      return;
+    }
+    const obj = await getJWTPayload(ctx.header.authorization);
+    // 查表看是否收藏
+    const userCollect = await UserCollectModel.findOne({ uid: obj._id, pid });
+    // 用户已经收藏了帖子
+    if (userCollect) {
+      await UserCollectModel.deleteOne({ uid: obj._id, pid })
+      ctx.body = {
+        code: 200,
+        msg: '取消收藏成功',
+        isCollect: "0"
+      }
+    }
+    // 用户未收藏帖子
+    else {
+      console.log('pid', pid)
+      const newCollect = new UserCollectModel({
+        uid: obj._id,
+        pid,
+      })
+      const result = await newCollect.save()
+      if (result) {
+        ctx.body = {
+          code: 200,
+          msg: '收藏成功',
+          isCollect: "1"
+        }
+      }
+    }
+  }
 }
 
 export default new UserController()

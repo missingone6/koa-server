@@ -2,6 +2,7 @@ import LinkModel from '../model/Link';
 import TipModel from '../model/Tip';
 import PostModel from '../model/Post';
 import UserModel from '../model/User';
+import UserCollectModel from '../model/UserCollect';
 import mkdir from 'make-dir';
 import { v4 as uuidv4 } from 'uuid'
 import config from '../config';
@@ -60,17 +61,45 @@ class ContentController {
       }
       return;
     }
-    const post = await PostModel.findPostByPid(pid)
 
+    // 更新文章阅读记数
+    await PostModel.updateOne(
+      { _id: pid },
+      { $inc: { reads: 1 } }
+    )
+
+    // 查询
+    const post = await PostModel.findPostByPid(pid);
     if (post) {
+      const newPost = post.toJSON();
+      // 默认用户没收藏
+      newPost.isCollect = "0";
+      // 如果用户已登录，判断用户是否点赞该文章
+      if (typeof ctx.header.authorization !== 'undefined') {
+        const obj = await getJWTPayload(ctx.header.authorization)
+        if (typeof obj._id !== 'undefined') {
+          const newUserCollect = await UserCollectModel.findOne({
+            uid: obj._id,
+            pid
+          })
+          if (newUserCollect) {
+            newPost.isCollect = "1";
+          }
+        }
+      }
       ctx.body = {
         code: 200,
-        data: post,
+        data: newPost,
         msg: '查询文章详情成功'
       }
-      return
+    } else {
+      ctx.body = {
+        code: 500,
+        msg: '获取文章详情失败'
+      }
     }
   }
+
   // 查询友情链接
   async getLinks(ctx) {
     const result = await LinkModel.find()
