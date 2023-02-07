@@ -184,6 +184,32 @@ class ContentController {
       data: result
     }
   }
+
+  // 删除帖子
+  async deletePostsByUid(ctx) {
+    const { pid } = ctx.request.query;
+    const obj = await getJWTPayload(ctx.header.authorization);
+    const post = await PostModel.findOne({ uid: obj._id, _id: pid });
+    if (post) {
+      const result = await PostModel.deleteOne({ uid: obj._id, _id: pid });
+      if (result.deletedCount === 1) {
+        ctx.body = {
+          code: 200,
+          msg: '删除成功'
+        }
+      } else {
+        ctx.body = {
+          code: 500,
+          msg: '删除失败，请报告管理员'
+        }
+      }
+    } else {
+      ctx.body = {
+        code: 500,
+        msg: '删除失败，您无此权限！'
+      }
+    }
+  }
 }
 
 export default new ContentController();

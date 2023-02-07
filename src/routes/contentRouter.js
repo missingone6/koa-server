@@ -14,6 +14,7 @@ router.post('/api/users/photo', ContentController.upLoadPhoto);
 router.post('/api/content/posts', ContentController.addPost);
 // 查询文章详情（帖子详情）
 router.get('/api/public/list', ContentController.getPostsDetail);
-
+// 删除帖子
+router.delete('/api/users/list', ContentController.deletePostsByUid);
 
 export default router;

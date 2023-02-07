@@ -112,7 +112,7 @@ class UserController {
     }
     ctx.body = {
       code: 200,
-      msg: '请求成功',
+      msg: '签到成功',
       ...result,
       lastSignIn: newRecord.created
     }
@@ -408,16 +408,21 @@ class UserController {
     )
     if (result) {
       result = result.map((item) => item.toJSON())
+      const newResult = [];
       for (let i = 0; i < result.length; i++) {
         let item = result[i];
-        const post = await PostModel.findOne({ _id: item.pid })
-        item.title = post.title;
-        item.created = post.created;
+        const post = await PostModel.findOne({ _id: item.pid });
+        // 帖子可能已被删除
+        if (post) {
+          item.title = post.title;
+          item.created = post.created;
+          newResult.push(item)
+        }
       }
       const total = await UserCollectModel.getLengthOfListsByUid(obj._id)
       ctx.body = {
         code: 200,
-        data: result,
+        data: newResult,
         total,
         msg: '查询用户收藏的帖子成功'
       }
