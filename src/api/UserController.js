@@ -6,6 +6,7 @@ import moment from 'moment';
 import { v4 as uuidv4 } from 'uuid'
 import { getHValue, getValue, setValue } from '../config/RedisConfig';
 import send from '../config/MailConfig';
+import PostModel from '../model/Post';
 
 class UserController {
   // 用户签到接口
@@ -370,6 +371,32 @@ class UserController {
       }
     }
   }
+
+  // 查询用户发贴记录(查询用户文章列表)
+  async getPostsByUid(ctx) {
+    const { page, limit } = ctx.request.query;
+    const obj = await getJWTPayload(ctx.header.authorization)
+    const result = await PostModel.getListsByUid(
+      obj._id,
+      page ? Number(page) : 0,
+      limit ? Number(limit) : 10,
+    )
+    const total = await PostModel.getLengthOfListsByUid(obj._id)
+    if (result) {
+      ctx.body = {
+        code: 200,
+        data: result,
+        total,
+        msg: '查询用户发贴记录成功'
+      }
+    } else {
+      ctx.body = {
+        code: 500,
+        msg: '查询用户发贴记录失败'
+      }
+    }
+  }
+  
 }
 
 export default new UserController()

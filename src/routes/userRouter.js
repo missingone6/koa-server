@@ -22,4 +22,7 @@ router.post('/email/password', UserController.sendmailAboutPassword);
 // 收藏/取消收藏接口
 router.post('/users/collect', UserController.setOrCancelCollect);
 
+// 查询用户发贴记录(查询用户文章列表)
+router.get('/users/lists', UserController.getPostsByUid);
+
 export default router;

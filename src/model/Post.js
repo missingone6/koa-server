@@ -81,7 +81,22 @@ PostSchema.statics = {
       path: 'uid',
       select: 'name pic isVip _id'
     })
-  }
+  },
+  /**
+   * 查询用户发贴记录(查询用户文章列表)
+   */
+  getListsByUid: function (id, page, limit) {
+    return this.find({ uid: id })
+      .skip(page * limit)
+      .limit(limit)
+      .sort({ created: -1 })
+  },
+  /**
+   * 查询用户发贴记录总数(查询用户文章列表总数)
+   */
+  getLengthOfListsByUid: function (id) {
+    return this.find({ uid: id }).countDocuments();
+  },
 }
 const PostModel = mongoose.model('posts', PostSchema);
 
