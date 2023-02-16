@@ -116,6 +116,33 @@ class CommentsController {
     }
 
   }
+
+  // 查询用户评论列表
+  async getCommentsByUid(ctx) {
+    let { page, limit } = ctx.request.query;
+    if (page === undefined) {
+      page = 0;
+    }
+    if (limit === undefined) {
+      limit = 10;
+    }
+    const obj = await getJWTPayload(ctx.header.authorization)
+    let result = await CommentsModel.getCommentsListByUid(obj._id, page, limit)
+    if (result) {
+      const total = await CommentsModel.queryCountByUid(obj._id)
+      ctx.body = {
+        code: 200,
+        data: result,
+        msg: '查询用户评论列表成功',
+        total,
+      }
+    } else {
+      ctx.body = {
+        code: 500,
+        msg: '查询用户评论列表失败'
+      }
+    }
+  }
 }
 
 export default new CommentsController()

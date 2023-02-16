@@ -50,6 +50,19 @@ CommentsSchema.statics = {
   queryCount: function (id) {
     return this.find({ pid: id }).countDocuments()
   },
+  // 查询用户评论列表
+  getCommentsListByUid: function (cuid, page, limit) {
+    return this.find({ cuid })
+      .sort({ created: -1 })
+      .select("created content")
+      .populate({
+        path: 'pid',
+        select: '_id title'
+      }).skip(page * limit).limit(limit);
+  },
+  queryCountByUid: function (cuid) {
+    return this.find({ cuid }).countDocuments()
+  },
 }
 
 const CommentsModel = mongoose.model('comments', CommentsSchema)

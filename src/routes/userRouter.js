@@ -13,6 +13,8 @@ router.patch('/users/username', UserController.usernameUpdate);
 router.patch('/users/password', UserController.passwordUpdate);
 // 用户基本信息更新
 router.patch('/users/basic', UserController.updateBasicInf);
+// 查询用户基本信息
+router.get('/users/basic', UserController.getBasicUserInformation);
 
 // 发送邮箱更新邮件
 router.post('/email/username', UserController.sendmailAboutUsername);

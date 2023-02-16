@@ -7,8 +7,8 @@ import SignInModel from '../model/SignIn';
 import { getHValue } from '../config/RedisConfig';
 
 // 判断今日是否签到
-const addIsSignIn = async (userObj) => {
-  const result = await SignInModel.findByUid(userObj._id)
+export const addIsSignIn = async (userObj) => {
+  const result = await SignInModel.findByUid(userObj._id);
   // 用户有签到记录
   if (result !== null) {
     userObj.lastSignIn = result.created;

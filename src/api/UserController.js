@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { getHValue, getValue, setValue } from '../config/RedisConfig';
 import send from '../config/MailConfig';
 import PostModel from '../model/Post';
+import { addIsSignIn } from './LoginController';
 
 class UserController {
   // 用户签到接口
@@ -433,6 +434,20 @@ class UserController {
       }
     }
   }
+
+  // 查询用户基本信息
+  async getBasicUserInformation(ctx) {
+    const obj = await getJWTPayload(ctx.header.authorization)
+    let user = await User.findByID(obj._id);
+    user = await addIsSignIn(user.toJSON())
+    ctx.body = {
+      code: 200,
+      data: user,
+      msg: '查询用户基本信息成功'
+    }
+  }
+
+
 }
 
 export default new UserController()
