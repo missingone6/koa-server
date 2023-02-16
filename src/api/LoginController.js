@@ -1,10 +1,11 @@
 import jwt from 'jsonwebtoken';
 import moment from 'moment';
-import { checkCode } from '../common/util';
+import { checkCode, isEmptyObject } from '../common/util';
 import config from '../config';
 import UsersModel from '../model/User';
 import SignInModel from '../model/SignIn';
-import { getHValue } from '../config/RedisConfig';
+import { getHValue, setValue } from '../config/RedisConfig';
+import send from '../config/MailConfig';
 
 // 判断今日是否签到
 export const addIsSignIn = async (userObj) => {
@@ -98,18 +99,37 @@ class LoginController {
             msg: '昵称与他人重复，请修改昵称'
           }
         } else {
-          // 写入数据
-          const data = new UsersModel({
+          // 派发jwt
+          const token = jwt.sign({
             username,
+          }, config.JWT_REGISTER_SECRET, {
+            expiresIn: config.JWT_REGISTER_EXPIRESIN
+          });
+          // 信息存入redis
+          await setValue(username, {
             password,
             name
-          });
-          const result = await data.save();
+          }, 30 * 60);
+          // 发送邮件、验证邮箱否是是本人邮箱
+          await send({
+            subject: '注册-验证邮箱',
+            data: {
+              token,
+            },
+            route: '/confirm/register',
+            expire: moment()
+              .add(30, 'minutes')
+              .format('YYYY-MM-DD HH:mm:ss'),
+            email: username,
+            name: name
+          })
+
           ctx.body = {
             code: 200,
-            msg: '注册成功',
-            data: result
+            msg: `验证链接已发至您的邮箱${username}，请登录邮箱查看`,
           }
+          return;
+
         }
       }
     } else {
@@ -119,6 +139,50 @@ class LoginController {
       }
     }
   }
+
+  // 用户验证注册接口
+  async verifyRegister(ctx) {
+    const { token } = ctx.request.body;
+    if (token === undefined) {
+      ctx.body = {
+        code: 404,
+        msg: '缺少参数'
+      }
+      return;
+    }
+    // 验证token是否正确
+    let cert;
+    try {
+      cert = jwt.verify(token, config.JWT_REGISTER_SECRET);
+    } catch (err) {
+      ctx.body = {
+        code: 404,
+        msg: '很抱歉,token值无效或者链接已过期'
+      }
+      return;
+    }
+    const obj = await getHValue(cert.username);
+    if (obj === null || isEmptyObject(obj)) {
+      ctx.body = {
+        code: 404,
+        msg: '很抱歉，链接有误或者链接已过期'
+      }
+      return;
+    }
+    const { password, name } = obj;
+    // 写入数据
+    const data = new UsersModel({
+      username: cert.username,
+      password,
+      name
+    });
+    const result = await data.save();
+    ctx.body = {
+      code: 200,
+      msg: '注册成功'
+    }
+  }
+
   // 忘记密码
   async password(ctx) {
     const { key } = ctx.request.body;

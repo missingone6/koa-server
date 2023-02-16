@@ -14,6 +14,10 @@ const JWT_SECRET = 'galrkgeajlrgbpno';
 // https://github.com/auth0/node-jsonwebtoken#token-expiration-exp-claim
 const JWT_EXPIRESIN = '1d';
 
+const JWT_REGISTER_SECRET = 'loginfsawtonikmegrgrr3gerago';
+const JWT_REGISTER_EXPIRESIN = '30m';
+
+
 // 前端
 export const frontDevelopmentBaseUrl = 'http://localhost:3000';
 export const frontProductionBaseUrl = '';
@@ -37,4 +41,6 @@ export default {
   JWT_EXPIRESIN,
   Front_BASE_URL,
   photoUploadPath,
+  JWT_REGISTER_SECRET,
+  JWT_REGISTER_EXPIRESIN,
 }

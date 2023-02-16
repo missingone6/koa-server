@@ -22,8 +22,17 @@ const getJWTPayload = (token) => {
   return jwt.verify(token.split(' ')[1], config.JWT_SECRET)
 }
 
+// 判断是不是对象
+const isEmptyObject = (obj) => {
+  if(Object.prototype.toString.call(obj) === '[object Object]'&&Object.keys(obj).length === 0){
+    return true;
+  }
+  return false;
+}
+
 export {
   checkCode,
   createTime,
   getJWTPayload,
+  isEmptyObject,
 }

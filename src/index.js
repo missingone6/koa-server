@@ -22,6 +22,7 @@ const jwt = JWT({
     /^\/api\/login/,
     /^\/api\/public/,
     /^\/api\/email\/password$/,
+    /^\/api\/verify/,
   ]
 });
 initRedis();
