@@ -12,7 +12,7 @@ const REDIS = {
 
 const JWT_SECRET = 'galrkgeajlrgbpno';
 // https://github.com/auth0/node-jsonwebtoken#token-expiration-exp-claim
-const JWT_EXPIRESIN = '1d';
+const JWT_EXPIRESIN = '30m';
 
 const JWT_REGISTER_SECRET = 'loginfsawtonikmegrgrr3gerago';
 const JWT_REGISTER_EXPIRESIN = '30m';
@@ -30,8 +30,16 @@ const BACK_BASE_URL = process.env.NODE_ENV === 'development' ? backDevelopmentBa
 const photoUploadPath = process.env.NODE_ENV === 'development'
   ? path.join(path.resolve(__dirname), '../../public/img')
   : path.join(path.resolve(__dirname), '../../public/img')
-console.log('11',photoUploadPath)
+console.log('11', photoUploadPath)
 
+// jwt白名单
+const JWT_WHITE_LIST = [
+  /^\/public/,
+  /^\/api\/login/,
+  /^\/api\/public/,
+  /^\/api\/email\/password$/,
+  /^\/api\/verify/,
+]
 export default {
   DB_NAME,
   MONGO_HOSTNAME,
@@ -43,4 +51,5 @@ export default {
   photoUploadPath,
   JWT_REGISTER_SECRET,
   JWT_REGISTER_EXPIRESIN,
+  JWT_WHITE_LIST,
 }

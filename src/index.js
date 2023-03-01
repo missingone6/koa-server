@@ -12,18 +12,13 @@ import { initRedis } from './config/RedisConfig';
 import config from './config';
 import errorHandle from './common/errorHandle';
 import koaMount from 'koa-mount';
+import RefreshTokenHandle from './common/middleware/RefreshTokenHandle';
 
 const app = new koa();
 const jwt = JWT({
   secret: config.JWT_SECRET,
 }).unless({
-  path: [
-    /^\/public/,
-    /^\/api\/login/,
-    /^\/api\/public/,
-    /^\/api\/email\/password$/,
-    /^\/api\/verify/,
-  ]
+  path: config.JWT_WHITE_LIST
 });
 initRedis();
 
@@ -39,7 +34,8 @@ const middleware = compose([
   jsonUtil(),
   helmet(),
   errorHandle,
-  jwt
+  RefreshTokenHandle,
+  jwt,
 ])
 app.use(middleware);
 
