@@ -19,15 +19,9 @@ WeShare是一款pc端的发帖分享论坛。
 
 :rocket: 用户模块实现了修改用户资料、展示用户资料、每日签到获取积分功能
 
+...
 
 
-前端使用react+react-router-dom实现单页面，使用axios请求后端数据，并使用react-redux管理用户基本信息。
-
-服务端采用koa+mongodb+redis实现。
-
-基于React+React-reudx和node.js的前后端分离的pc端项目。项目前端基于
-
-该项目是一个基于发贴的移动端社交网站。前端使用 vue-cli 作为 Vue 框架开发脚手架，并使用 Vuex 管理数据，加深了我对 Vue 生命周期的理解。同时采用 flex 配合 rem 适配了主流移动端，利用 webSocket 实现了系统推送功能。服务端使用 Nodejs、Express、MySQL 实现，通过 session、 cookie 机制判别用户身份，实现了登录注册、发帖、评论回复、点赞等功能。在填充数据的过程中熟悉了 与服务端的交互。这个项目使我对组件化开发和 Vue 框架有了一定的了解。
 
 # 项目亮点
 :rocket: 采用jwt+localStorage进行会话管理，实现了用户在期限内免登录的效果
